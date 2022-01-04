@@ -19,8 +19,12 @@ public class ThisinhBUS {
         }
     }
     
-    public boolean insert(ThisinhDTO thisinh){
-        return dao.insert(thisinh);
+    private void insert(ThisinhDTO thisinh){        
+        boolean result =  dao.insert(thisinh);
+        if(result)
+        {
+            this.array.add(thisinh);
+        }        
     }
     
     public String get_phongthi(String khoathi,String trinhdo){
@@ -30,18 +34,105 @@ public class ThisinhBUS {
         return String.valueOf(temp.get(0));
     }
     
-    public void insert_without_SBD(ThisinhDTO thisinh,String trinhdo,String khoathi){
+    public ArrayList insert_without_SBD(ThisinhDTO thisinh,String trinhdo,String khoathi){
         int count = dao.get_SDB(trinhdo, khoathi);
-        if(trinhdo.equals("A2"))
-            if(count<10) thisinh.setSBD("A200"+count+1);
-            if(count<100)thisinh.setSBD("A20" +count+1);
-        else
-            if(count<10) thisinh.setSBD("B100"+count+1);
-            if(count<100)thisinh.setSBD("B10" +count+1);
-        boolean a = this.insert(thisinh);
+        System.out.println("Thứ tự:"+count);
+        System.out.println("Trình độ:"+trinhdo);
+        if(trinhdo.equals("A2")){
+            if(count<10) thisinh.setSBD("A200"+(count+1));
+            else if(count<99)thisinh.setSBD("A20" +(count+1));
+            else if(count>=99)thisinh.setSBD("A2" +(count+1));
+        }
+        else{
+            if(count<10) thisinh.setSBD("B100"+(count+1));
+            else if(count<99)thisinh.setSBD("B10" +(count+1));
+            else if(count>=99)thisinh.setSBD("B1" +(count+1));
+        }
+        this.insert(thisinh);
+        return this.array;
     }
     
     public String[] getkhoathi(){
         return dao.get_khoathi();
     }
+    
+    public ArrayList update(ThisinhDTO thisinh){
+        dao.update(thisinh);
+        int location = this.location_of_thisinh(thisinh);
+        if(location != -1)
+        {
+            this.array.set(location, thisinh);
+        }
+        return this.array;
+    }
+    
+    private int location_of_thisinh(ThisinhDTO thisinh){
+        for(int i=0;i<this.array.size();i++)
+        {
+            ThisinhDTO temp = this.array.get(i);
+            if(temp.getSBD().equals(thisinh.getSBD())&&temp.getKhoathi().equals(thisinh.getKhoathi()))
+                return i;
+        }    
+        return -1;
+    }
+    
+    public ArrayList timkiem(int loai,String input){        
+        ArrayList<ThisinhDTO> result = new ArrayList();
+        switch(loai){
+           case 0://SBD
+           {
+               for(int i=0; i<this.array.size();i++){
+                   ThisinhDTO temp = this.array.get(i);
+                   if(temp.getSBD().equals(input))
+                       result.add(temp);
+               }
+               break;
+           }
+           case 1://TEN
+           {
+               for(int i=0; i<this.array.size();i++){
+                   ThisinhDTO temp = this.array.get(i);
+                   if(temp.getTen().equalsIgnoreCase(input))
+                       result.add(temp);
+               }
+               break;
+           }
+           case 2://CMND
+           {
+               for(int i=0; i<this.array.size();i++){
+                   ThisinhDTO temp = this.array.get(i);
+                   if(temp.getCMND().equals(input))
+                       result.add(temp);
+               }
+               break;
+           }
+           case 3://phongthi
+           {
+               for(int i=0; i<this.array.size();i++){
+                   ThisinhDTO temp = this.array.get(i);
+                   if(temp.getPhongthi().equals(input))
+                       result.add(temp);
+               }
+               break;
+           }
+           case 4://khoathi
+           {
+               for(int i=0; i<this.array.size();i++){
+                   ThisinhDTO temp = this.array.get(i);
+                   if(temp.getKhoathi().equals(input))
+                       result.add(temp);
+               }
+               break;
+           }
+       }
+        return result;
+    }
+    
+    public ArrayList Delete(int location){
+        ThisinhDTO temp = this.array.get(location);
+        dao.delete(temp);
+        this.array.remove(location);
+        return this.array;
+    }
 }
+

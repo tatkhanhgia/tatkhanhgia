@@ -64,7 +64,7 @@ public class ThisinhDAO {
     
     public int get_SDB(String trinhdo,String khoathi){
         try {
-            String statement = "`SBD` LIKE \""+trinhdo+"\" and `khoathi`=\""+khoathi+"\"";
+            String statement = "`SBD` LIKE '"+trinhdo+"%' and `khoathi`=\""+khoathi+"\"";
             db = new ConnectDB();
             int count = db.count_in_DB_with_condition("thisinh", statement);
             return count;
@@ -119,17 +119,49 @@ public class ThisinhDAO {
         }
     }
     
+    public void update(ThisinhDTO thisinh){
+        try {
+            String table = "thisinh";
+            String condition = "SBD ='"+thisinh.getSBD()+"' and khoathi ='"+thisinh.getKhoathi()+"'";
+            String update = "ho =N'"+thisinh.getHo()+"',";
+            update += "ten =N'"+thisinh.getTen()+"',";
+            update += "gioitinh ="+thisinh.getGioitinh()+",";
+            update += "ngaysinh ='"+thisinh.getNgaysinh()+"',";
+            update += "noisinh =N'"+thisinh.getNoisinh()+"',";
+            update += "cmnd =N'"+thisinh.getCMND()+"',";
+            update += "ngaycap ='"+thisinh.getNgaycap()+"',";
+            update += "noicap =N'"+thisinh.getNoicap()+"',";
+            update += "sdt =N'"+thisinh.getSDT()+"',";
+            update += "email =N'"+thisinh.getEmail()+"' ";
+            db = new ConnectDB();
+            db.Update(table, update, condition);            
+        } catch (SQLException ex) {
+            Logger.getLogger(ThisinhDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void delete(ThisinhDTO thisinh){
+        try {
+            db = new ConnectDB();
+            String table = "thisinh";
+            String condition = " SBD = '"+thisinh.getSBD()+"' and khoathi='"+thisinh.getKhoathi()+"'";
+            db.Delete(table, condition);
+                    } catch (SQLException ex) {
+            Logger.getLogger(ThisinhDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public static void main(String[] args){
         ThisinhDAO a  = new ThisinhDAO();
+        System.out.println(a.get_SDB("B1","Khoa004"));
 //        ThisinhDTO temp = new ThisinhDTO("B1003","Nguyễn Minh","Hiếu","1","2001-08-09","TPHCM","0987654321","2018-07-08","TPHCM","0123456789","asdxcv@gmail.com","B1P03","Khoa001");
 //        a.insert(temp);
 //        a.get_all();
 //        for(int i=0 ; i<a.array.size(); i++){
 //            System.out.println("sbd : "+a.array.get(i).getSBD());
 //        }
-            ArrayList temp = a.get_phongthi_checkin_thisinh("Khoa001","A2");
-            for(int i=0 ; i<temp.size(); i++){
-            System.out.println("phongf thi:"+temp.get(i));
-        }
+//            ArrayList temp = a.get_phongthi_checkin_thisinh("Khoa001","A2");
+//            for(int i=0 ; i<temp.size(); i++){
+//            System.out.println("phongf thi:"+temp.get(i));
+//        }
     }
 }

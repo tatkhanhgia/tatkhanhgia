@@ -37,10 +37,12 @@ public class QuanLyThiSinh extends JFrame{
     DefaultTableModel model;
     JTable tblDSSV;
     JScrollPane jScrollPane1;
-    JTextField SBD, hot, tent, gioitinh,ngaysinhtxt,noisinhtxt,
+    JTextField SBD, hot, tent, gioitinh,ngaysinhtxt,noisinhtxt,timkiem3,
             cmndtxt,ngaycaptxt,noicaptxt,sdttxt,emailtxt,phongthitxt,khoathitxt;
     JRadioButton nam, nu;
+    JComboBox timkiem2;
     ButtonGroup groupgioitinh;    
+    JButton timkiem4;
     Vector header;
     ThisinhBUS bus;
     int press=-1;
@@ -135,19 +137,19 @@ public class QuanLyThiSinh extends JFrame{
         timkiem.setBounds(150, 75, 110, 25);
 
         //TEXTFIELD timkiem
-        final JTextField timkiem3 = new JTextField();
+        timkiem3 = new JTextField();
         timkiem3.setBounds(350, 75, 250, 26);
 
         //COMBOBOX tim kiem
         String[] a = {"    SBD", "     Tên","     CMND", "    Phòng Thi","     Khóa Thi"};
-        final JComboBox timkiem2 = new JComboBox(a);
+        timkiem2 = new JComboBox(a);
         timkiem2.setSelectedIndex(0);
         timkiem2.setBounds(250, 75, 80, 25);
 
 
 
         //button tìm kiếm
-        final JButton timkiem4 = new JButton();
+        timkiem4 = new JButton();
         timkiem4.setText("Tìm");
         timkiem4.setForeground(Color.black);
         timkiem4.setFont(new Font("Arial", Font.BOLD, 15));
@@ -338,9 +340,8 @@ public class QuanLyThiSinh extends JFrame{
 
 //CHỨC NĂNG
         timkiem4.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
-                
+                timkiem();
         }});
         tblDSSV.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -446,8 +447,7 @@ public class QuanLyThiSinh extends JFrame{
 
         panel3.add(them);
         panel3.add(sua);
-        panel3.add(xoa);
-        panel3.add(sapxep);
+        panel3.add(xoa);        
         panel3.add(thoat);
         panel3.add(taidl);
                 
@@ -462,51 +462,42 @@ public class QuanLyThiSinh extends JFrame{
        this.setVisible(true);
    }
    
+   //Hàm để tải dữ liệu lên table_ có thể thay thế bằng việc tải lên sẵn
    public void taidulieu(){
-       if (model!=null)
-       {
-           model = new DefaultTableModel(header, 0)
-                {   @Override
-                    public boolean isCellEditable(int i, int i1) {
-                        return false;
-                    }
-                };
-       }
        bus = new ThisinhBUS();
        ArrayList<ThisinhDTO> arrayresult = bus.array;
-       if (model.getRowCount() == 0) {                         //KHÔNG CHO NGDUNG CHỈNH SỬA TRÊN TABLE
-            model = new DefaultTableModel(header, 0)
-                {   @Override
-                    public boolean isCellEditable(int i, int i1) {
-                        return false;
-                    }
-                };
-        }
-         for(int i=0;i<arrayresult.size();i++){
-            Vector row = new Vector();
-            ThisinhDTO thisinh=(ThisinhDTO)arrayresult.get(i);
-            row.add(thisinh.getSBD());
-            row.add(thisinh.getHo());
-            row.add(thisinh.getTen());
-            row.add(thisinh.getGioitinh());
-            row.add(thisinh.getNgaysinh());
-            row.add(thisinh.getNoisinh());
-            row.add(thisinh.getCMND());
-            row.add(thisinh.getNgaycap());
-            row.add(thisinh.getNoicap());
-            row.add(thisinh.getSDT());
-            row.add(thisinh.getEmail());
-            row.add(thisinh.getPhongthi());
-            row.add(thisinh.getKhoathi());            
-            model.addRow(row);
-            }
-        tblDSSV.setModel(model);
+       this.load_data_to_jtable(arrayresult);       
    }
    
+   //Hàm sửa thông tin thí sinh
    public void sua(){
-       
+       if(tblDSSV.getSelectedColumn()<0)
+       {
+           JOptionPane.showMessageDialog(null, "Vui lòng chọn thông tin thay đổi","Cảnh báo",JOptionPane.CANCEL_OPTION);
+           return;
+       }
+        ThisinhDTO thisinh = new ThisinhDTO();
+        thisinh.setSBD(this.SBD.getText());
+        thisinh.setHo(this.hot.getText());
+        thisinh.setTen(this.tent.getText());
+        thisinh.setCMND(this.cmndtxt.getText());
+        thisinh.setEmail(this.emailtxt.getText());
+        if (this.nam.isSelected())
+            thisinh.setGioitinh("1");
+        else
+            thisinh.setGioitinh("0");                
+        thisinh.setNgaycap(this.ngaycaptxt.getText());
+        thisinh.setNgaysinh(this.ngaysinhtxt.getText());
+        thisinh.setNoicap(this.noicaptxt.getText());
+        thisinh.setNoisinh(this.noisinhtxt.getText());
+        thisinh.setSDT(this.sdttxt.getText());      
+        thisinh.setKhoathi(this.khoathitxt.getText());
+        ArrayList temp = bus.update(thisinh);
+        //this.taidulieu();
+        this.load_data_to_jtable(temp);
    }
    
+   //Hàm thêm thí sinh
    public void them(){
       QuanLyThiSinh_ThemThiSinh insert = new QuanLyThiSinh_ThemThiSinh();
       insert.setVisible(true);
@@ -514,9 +505,19 @@ public class QuanLyThiSinh extends JFrame{
    }
    
    public void xoa(){
-       
+       int rt = JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn xóa không?","Cảnh báo",JOptionPane.YES_NO_OPTION);
+       if(rt == JOptionPane.YES_OPTION){
+       int i = tblDSSV.getSelectedRow();
+       if(i!=-1){
+        ArrayList temp = bus.Delete(i);
+        this.load_data_to_jtable(temp);
+       }
+       else
+        JOptionPane.showMessageDialog(null,"Vui lòng chọn thí sinh cần xóa","Cảnh báo",JOptionPane.CANCEL_OPTION);
+       }
    }
    
+   //Hàm để set hành động click và jtable_chi tiết thí sinh
    public void click(int i){
        ThisinhDTO temp = bus.array.get(i);
        this.SBD.setText(temp.getSBD());
@@ -540,6 +541,48 @@ public class QuanLyThiSinh extends JFrame{
        this.emailtxt.setText(temp.getEmail());
        this.phongthitxt.setText(temp.getPhongthi());
        this.khoathitxt.setText(temp.getKhoathi());
+   }
+   
+   //Hàm để tìm kiếm
+   public void timkiem(){
+       String timkiem = timkiem3.getText();
+       int loai       = timkiem2.getSelectedIndex();       
+       ArrayList result = bus.timkiem(loai, timkiem);
+       this.load_data_to_jtable(result);
+   }
+   
+   //Hàm để load dữ liệu từ array vào jtable
+   public void load_data_to_jtable(ArrayList data){
+       //Xóa data cũ, load lại data mới
+       if (model!=null)
+       {
+           model = new DefaultTableModel(header, 0)
+                {   @Override
+                    public boolean isCellEditable(int i, int i1) {
+                        return false;
+                    }
+                };
+       }
+       for(int i=0;i<data.size();i++){
+            Vector row = new Vector();
+            ThisinhDTO thisinh=(ThisinhDTO)data.get(i);
+            row.add(thisinh.getSBD());
+            row.add(thisinh.getHo());
+            row.add(thisinh.getTen());
+            row.add(thisinh.getGioitinh());
+            row.add(thisinh.getNgaysinh());
+            row.add(thisinh.getNoisinh());
+            row.add(thisinh.getCMND());
+            row.add(thisinh.getNgaycap());
+            row.add(thisinh.getNoicap());
+            row.add(thisinh.getSDT());
+            row.add(thisinh.getEmail());
+            row.add(thisinh.getPhongthi());
+            row.add(thisinh.getKhoathi());            
+            model.addRow(row);
+            }
+        tblDSSV.setModel(model);
+       
    }
    
    public static void main(String[] args){

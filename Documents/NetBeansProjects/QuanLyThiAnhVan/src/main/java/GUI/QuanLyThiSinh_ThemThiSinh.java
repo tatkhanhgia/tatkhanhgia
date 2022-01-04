@@ -352,7 +352,7 @@ public class QuanLyThiSinh_ThemThiSinh extends JFrame {
         thisinh.setSDT(this.sdttxt.getText());
         thisinh.setPhongthi(bus.get_phongthi((String)this.khoathi.getSelectedItem(),
                 trinhdo));
-        bus.insert_without_SBD(thisinh, (String)this.trinhdo.getSelectedItem(), (String)this.khoathi.getSelectedItem());
+        bus.insert_without_SBD(thisinh, trinhdo, (String)this.khoathi.getSelectedItem());
         this.dispose();
     }
     

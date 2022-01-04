@@ -114,7 +114,7 @@ public class ConnectDB {
             System.out.println(qry);
             st = conn.createStatement();
             int result = st.executeUpdate(qry);
-            close();
+            //close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Lỗi update ở DAO");
             return false;
