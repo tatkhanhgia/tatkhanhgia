@@ -1,6 +1,7 @@
 package GUI;
 
 import BUS.ThisinhBUS;
+import DTO.PhongthiDTO;
 import DTO.ThisinhDTO;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,7 +34,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-public class QuanLyThiSinh extends JFrame{
+public class QuanLyPhongThi_ChitietPhong extends JFrame{
     DefaultTableModel model;
     JTable tblDSSV;
     JScrollPane jScrollPane1;
@@ -46,9 +47,12 @@ public class QuanLyThiSinh extends JFrame{
     Vector header;
     ThisinhBUS bus;
     int press=-1;
-   
-   public QuanLyThiSinh() {
+    PhongthiDTO phongthi;
+    
+   public QuanLyPhongThi_ChitietPhong(PhongthiDTO phongthi) {
 
+        this.phongthi = phongthi;
+        
         Border blackline = BorderFactory.createLineBorder(Color.black);
         Border matte = BorderFactory.createMatteBorder(0, 0, 0, 1, Color.black);
         TitledBorder title;
@@ -89,10 +93,10 @@ public class QuanLyThiSinh extends JFrame{
 //Label head
         //label danh sách sv
         JLabel label1 = new JLabel();
-        label1.setText("Danh Sách Thí Sinh");
+        label1.setText("Danh sách thí sinh phòng "+phongthi.getPhongthi());
         label1.setForeground(Color.BLACK);
         label1.setFont(new Font("Tahoma", Font.BOLD, 30));
-        label1.setBounds(290, 10, 360, 50);
+        label1.setBounds(150, 10, 500, 50);
 
 //table
         model = new DefaultTableModel();
@@ -141,7 +145,7 @@ public class QuanLyThiSinh extends JFrame{
         timkiem3.setBounds(350, 75, 250, 26);
 
         //COMBOBOX tim kiem
-        String[] a = {"    SBD", "     Tên","     CMND", "    Phòng Thi","     Khóa Thi","SDT"};
+        String[] a = {"    SBD", "     Tên","     CMND", "    Phòng Thi","     Khóa Thi"};
         timkiem2 = new JComboBox(a);
         timkiem2.setSelectedIndex(0);
         timkiem2.setBounds(250, 75, 80, 25);
@@ -216,11 +220,11 @@ public class QuanLyThiSinh extends JFrame{
         email.setFont(new Font("Arail", Font.BOLD, 17));
         email.setBounds(300, 210, 100, 30);
         
-        JLabel phongthi = new JLabel();
-        phongthi.setText("Phòng Thi:");
-        phongthi.setForeground(Color.BLACK);
-        phongthi.setFont(new Font("Arail", Font.BOLD, 17));
-        phongthi.setBounds(300, 260, 100, 30);
+        JLabel phongthilabel = new JLabel();
+        phongthilabel.setText("Phòng Thi:");
+        phongthilabel.setForeground(Color.BLACK);
+        phongthilabel.setFont(new Font("Arail", Font.BOLD, 17));
+        phongthilabel.setBounds(300, 260, 100, 30);
         
         JLabel khoathi = new JLabel();
         khoathi.setText("Khóa Thi:");
@@ -328,11 +332,11 @@ public class QuanLyThiSinh extends JFrame{
         JButton xoa = new JButton("Xóa");
         xoa.setBounds(600, 100, 150, 35);
         
-        JButton diemthi = new JButton("Điểm thi");
-        diemthi.setBounds(600, 150, 150, 35);
+        JButton sapxep = new JButton("Sắp Xếp");
+        sapxep.setBounds(600, 150, 150, 35);
         
-        JButton thoat = new JButton("Thoát");
-        thoat.setBounds(600, 200, 150, 35);
+        JButton thoat = new JButton("Quay lại");
+        thoat.setBounds(600, 10, 150, 35);
         
         JButton taidl = new JButton("Tải dữ liệu");
         taidl.setBounds(600, 250, 150, 35);
@@ -399,12 +403,6 @@ public class QuanLyThiSinh extends JFrame{
             }
         });
         
-        diemthi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                diemthi();
-            }
-        });
-        
         taidl.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 taidulieu();
@@ -428,7 +426,7 @@ public class QuanLyThiSinh extends JFrame{
         panel3.add(email);
         panel3.add(ngaycap);
         panel3.add(noicap);
-        panel3.add(phongthi);
+        panel3.add(phongthilabel);
         panel3.add(khoathi);
         panel3.add(ngaysinh);
         panel3.add(noisinh);
@@ -451,19 +449,22 @@ public class QuanLyThiSinh extends JFrame{
         panel3.add(nam);
         panel3.add(nu);
 
-        panel3.add(them);
-        panel3.add(sua);
-        panel3.add(xoa);        
+//        panel3.add(them);
+//        panel3.add(sua);
+//        panel3.add(xoa);        
         panel3.add(thoat);
-        panel3.add(taidl);
-        panel3.add(diemthi);
+//        panel3.add(taidl);
                 
 
         //frame add
         add(panel1);
         add(panel2);
         add(panel3);
-        taidulieu();
+        //Auto load dữ liệu vào trước
+        bus = new ThisinhBUS();
+        ArrayList<ThisinhDTO> arrayresult = bus.get_thisinh_theo_phongthi(this.phongthi.getPhongthi(),
+                                                                         this.phongthi.getKhoathi());
+        this.load_data_to_jtable(arrayresult); 
     }
    
    public void run(){
@@ -472,9 +473,10 @@ public class QuanLyThiSinh extends JFrame{
    
    //Hàm để tải dữ liệu lên table_ có thể thay thế bằng việc tải lên sẵn
    public void taidulieu(){
-       bus = new ThisinhBUS();
-       ArrayList<ThisinhDTO> arrayresult = bus.array;
-       this.load_data_to_jtable(arrayresult);       
+        bus = new ThisinhBUS();
+       ArrayList<ThisinhDTO> arrayresult = bus.get_thisinh_theo_phongthi(phongthi.getPhongthi(),
+                                                                         phongthi.getKhoathi());
+       this.load_data_to_jtable(arrayresult);      
    }
    
    //Hàm sửa thông tin thí sinh
@@ -593,14 +595,8 @@ public class QuanLyThiSinh extends JFrame{
        
    }
    
-   //Hàm để chạy frame chi tiết điểm thi
-   public void diemthi(){
-       QuanLyDiemThi a = new QuanLyDiemThi(this.SBD.getText(), this.khoathitxt.getText());
-       a.run();
-   }
-   
-   public static void main(String[] args){
-       QuanLyThiSinh a = new QuanLyThiSinh();
+   public static void main(String[] args){       
+       QuanLyPhongThi_ChitietPhong a = new QuanLyPhongThi_ChitietPhong(new PhongthiDTO("A2P02","Khoa001"));
        a.run();
    }
 }

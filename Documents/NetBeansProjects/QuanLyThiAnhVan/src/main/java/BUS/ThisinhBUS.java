@@ -10,6 +10,7 @@ public class ThisinhBUS {
     private ThisinhDAO dao;
     public ArrayList<ThisinhDTO> array;
     
+    //Constructor get toàn bộ dữ liệu thí sinh
     public ThisinhBUS(){
         dao = new ThisinhDAO();
         this.array = dao.get_all();
@@ -17,6 +18,18 @@ public class ThisinhBUS {
         {
             System.out.println("Lỗi get dữ liệu thí sinh!");
         }
+    }
+    
+    //Hàm để get danh sách thí sinh theo phòng thi_ khóa thi truyền vào
+    public ArrayList get_thisinh_theo_phongthi(String phongthi, String khoathi){
+        ArrayList result = new ArrayList();
+        for(int i=0; i<this.array.size(); i++)
+        {
+            ThisinhDTO temp = this.array.get(i);
+            if(temp.getPhongthi().equals(phongthi) && temp.getKhoathi().equals(khoathi))
+                result.add(temp);
+        }
+        return result;
     }
     
     private void insert(ThisinhDTO thisinh){        
@@ -124,6 +137,15 @@ public class ThisinhBUS {
                }
                break;
            }
+           case 5://sdt
+           {
+               for(int i=0; i<this.array.size();i++){
+                   ThisinhDTO temp = this.array.get(i);
+                   if(temp.getSDT().equals(input))
+                       result.add(temp);
+               }
+               break;
+           }
        }
         return result;
     }
@@ -134,5 +156,18 @@ public class ThisinhBUS {
         this.array.remove(location);
         return this.array;
     }
+
+    //Đếm số lượng thí sinh trong phòng theo khóa
+    public int count_thisinh_in_phongthi(String phongthi,String khoathi){
+        int j = 0;
+        for(int i=0; i<this.array.size();i ++)
+        {
+            ThisinhDTO temp = this.array.get(i);
+            if(temp.getPhongthi().equals(phongthi) && temp.getKhoathi().equals(khoathi))
+                j++;
+        }
+        return j;
+    }
+
 }
 
