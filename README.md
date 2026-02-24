@@ -1,5 +1,5 @@
 # 💫 About Me:
-🔭 I’m currently working on Mobile-ID Company<br>👯 I’m looking to collaborate on Public Repository to improve my skill/knowledg<br>🌱 I’m currently learning Agent-Coding Management, DevOps and PM<br>💬 Ask me about<br>⚡ Fun fact: I very lazy but have the motivation to improve knowledge about IT area
+🔭 I’m currently working on Mobile-ID Company<br>👯 I’m looking to collaborate on Public Repository to improve my skill/knowledge<br>🌱 I’m currently learning Agent-Coding Management, DevOps and PM<br>💬 Ask me about<br>⚡ Fun fact: I very lazy but have the motivation to improve knowledge about IT area
 
 
 ## 🌐 Socials:
